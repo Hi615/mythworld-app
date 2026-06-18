@@ -13,9 +13,7 @@ const PORT = process.env.PORT || 3000;
 // IMPORTANT: change this in production, and set it via environment variable.
 const JWT_SECRET = process.env.JWT_SECRET || 'mythworld-dev-secret-change-me';
 
-const UPLOAD_DIR = process.env.RENDER
-  ? '/tmp/uploads'
-  : path.join(__dirname, 'uploads');
+const UPLOAD_DIR = '/tmp/mythworld-uploads';
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 const CATEGORIES = ['divine', 'supernatural', 'cryptid', 'myth', 'dream', 'unexplained'];
