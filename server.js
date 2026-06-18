@@ -256,7 +256,7 @@ app.use((err, req, res, next) => {
 
 // Fallback to index.html for any non-API route (simple SPA support)
 app.get('*', (req, res) => {
-  if (req.path.startsWith('/api/') || req.path.startsWith('/uploads/')) {
+  if (req.path.startsWith('/api/') || req.path.startsWith('/uploads/') || req.path.startsWith('/admin/')) {
     return res.status(404).json({ error: 'Not found' });
   }
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
