@@ -261,6 +261,34 @@ app.get('*', (req, res) => {
   }
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+// Admin route — only works if you know the secret key
+app.get('/admin/data', (req, res) => {
+  const secret = req.query.secret;
+  if (secret !== process.env.ADMIN_SECRET) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+  const data = db.get();
+  const summary = {
+    totalUsers: data.users.length,
+    totalPosts: data.posts.length,
+    users: data.users.map(u => ({
+      id: u.id,
+      email: u.email,
+      subscribed: u.subscribed,
+      createdAt: u.createdAt
+    })),
+    posts: data.posts.map(p => ({
+      id: p.id,
+      category: p.category,
+      title: p.title,
+      name: p.name,
+      place: p.place,
+      comments: p.comments.length,
+      createdAt: p.createdAt
+    }))
+  };
+  res.json(summary);
+});
 
 app.listen(PORT, () => {
   console.log(`MythWorld running at http://localhost:${PORT}`);
