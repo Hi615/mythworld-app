@@ -1,40 +1,36 @@
-// Simple file-based JSON database. Good for small/medium sites without
-// needing a separate database server. Data is stored in /data/db.json
-// and written to disk on every change (atomic write via temp file).
-
 const fs = require('fs');
 const path = require('path');
 
-const DB_PATH = path.join(__dirname, 'data', 'db.json');
+const DATA_DIR = '/tmp/mythworld-data';
+const DB_PATH = path.join(DATA_DIR, 'db.json');
 
-const DEFAULT_DATA = {
-  users: [],       // { id, email, passwordHash, createdAt }
-  posts: [],       // { id, category, title, name, place, description, image, video, comments: [], userId, createdAt }
-  nextUserId: 1,
-  nextPostId: 1,
-};
+function ensureDir() {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+}
 
 function load() {
+  ensureDir();
   if (!fs.existsSync(DB_PATH)) {
     const seeded = require('./seed-data');
     save(seeded);
-    return seeded;
+    return JSON.parse(JSON.stringify(seeded));
   }
   try {
     const raw = fs.readFileSync(DB_PATH, 'utf-8');
     return JSON.parse(raw);
   } catch (e) {
-    console.error('Failed to read db.json, reinitializing', e);
+    console.error('db.json corrupted, reinitializing:', e.message);
     const seeded = require('./seed-data');
     save(seeded);
-    return seeded;
+    return JSON.parse(JSON.stringify(seeded));
   }
 }
 
 function save(data) {
-  const tmp = DB_PATH + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
-  fs.renameSync(tmp, DB_PATH);
+  ensureDir();
+  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
 }
 
 let data = load();
@@ -42,9 +38,4 @@ let data = load();
 module.exports = {
   get: () => data,
   persist: () => save(data),
-  reset: () => {
-    data = require('./seed-data');
-    save(data);
-    return data;
-  },
 };
