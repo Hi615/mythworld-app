@@ -1,6 +1,4 @@
-/* ===========================================================
-   MythWorld frontend logic — talks to the Express API
-   =========================================================== */
+
 
 const CATEGORIES = {
   divine:        { label: "Divine Encounters",        icon: "🕯️", class: "seal-divine",        color: "var(--divine)" },
